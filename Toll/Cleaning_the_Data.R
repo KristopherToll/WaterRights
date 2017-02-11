@@ -13,3 +13,6 @@ gerald <- subset(bob, TotalPrice != "NA"
                  & bob$InflationAdjustedTotalPrice != "NA"
                  & bob$InflationAdjustedPricePerAnnualAcreFoot != "NA"
                  & bob$InflationAdjustedPricePerCommittedAcreFoot != "NA")
+
+nolease <- subset(gerald, Lease = "0")
+View(nolease)
