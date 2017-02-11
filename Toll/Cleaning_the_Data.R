@@ -10,4 +10,6 @@ gerald <- subset(bob, TotalPrice != "NA"
                  & bob$CommittedMinimumAcreFeet != "NA"
                  & bob$CommitedAverageAcreFeet != "NA"
                  & bob$CommitedMaximumAcreFeet != "NA"
-                 & bob$`InflationAdjustedTotal Price`)
+                 & bob$InflationAdjustedTotalPrice != "NA"
+                 & bob$InflationAdjustedPricePerAnnualAcreFoot != "NA"
+                 & bob$InflationAdjustedPricePerCommittedAcreFoot != "NA")
