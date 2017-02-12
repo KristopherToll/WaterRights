@@ -1,18 +1,25 @@
 #Importing the DATA!
 library(readxl)
-bob <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/Water_Transfer_Data_Feb_10.xls", na = "null")
-View(bob)
-# Removing "na" from bob
-gerald <- subset(bob, TotalPrice != "NA" 
+nemo <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/Water_Transfer_Data_Feb_10.xls", na = "null")
+View(nemo)
+# Removing "na" from nemo
+dory <- subset(nemo, TotalPrice != "NA" 
                  & MinimumAnnualAcreFeet != "NA" 
                  & AverageAnnualAcreFeet != "NA"
                  & MaximumAnnualAcreFeet != "NA"
-                 & bob$CommittedMinimumAcreFeet != "NA"
-                 & bob$CommitedAverageAcreFeet != "NA"
-                 & bob$CommitedMaximumAcreFeet != "NA"
-                 & bob$InflationAdjustedTotalPrice != "NA"
-                 & bob$InflationAdjustedPricePerAnnualAcreFoot != "NA"
-                 & bob$InflationAdjustedPricePerCommittedAcreFoot != "NA")
-
-nolease <- subset(gerald, Lease = "0")
-View(nolease)
+                 & nemo$CommittedMinimumAcreFeet != "NA"
+                 & nemo$CommitedAverageAcreFeet != "NA"
+                 & nemo$CommitedMaximumAcreFeet != "NA"
+                 & nemo$InflationAdjustedTotalPrice != "NA"
+                 & nemo$InflationAdjustedPricePerAnnualAcreFoot != "NA"
+                 & nemo$InflationAdjustedPricePerCommittedAcreFoot != "NA")
+# Removing Lease Observations
+# To remove Sales use a one instead
+bruce <- subset(dory, Lease == "0")
+View(bruce)
+# Remove the recycled vectors and the Lease Duration Vector and others
+merlin <- bruce[,-c(bruce$Unknown, 
+                    bruce$Recycled,
+                    bruce$Combination,
+                    )]
+View(merlin)
