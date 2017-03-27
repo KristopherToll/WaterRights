@@ -1,6 +1,8 @@
 # Kristopher C. Toll
 # Merging the Data
 
+
+library(data.table)
 # Read in the Data
 ClimateData <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Climate_data.RDS")
 
@@ -9,10 +11,22 @@ Water_Sales <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Tra
 
 # Merge
 library(dplyr)
-MasterData <- merge(Water_Sales, ClimateData, by = c("Month", "Year", "State"))
+MasterData <- merge(Water_Sales, ClimateData, c("Month", "Year", "State"))
+
+saveRDS(MasterData, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData.RDS")
 
 # Verify that MasterData has the same number of observations as Water_Sales
+
+table(ClimateData$State)
+table(Water_Sales$State)
+table(MasterData$State)
+
+table(ClimateData$Year)
+table(Water_Sales$Year)
+table(MasterData$Year)
 
 table(ClimateData$Month)
 table(Water_Sales$Month)
 table(MasterData$Month)
+
+#Everthing Checks out

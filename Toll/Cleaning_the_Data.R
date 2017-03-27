@@ -89,6 +89,6 @@ deb$WaterStrategistIssue <- gsub("(^Aug$)", "Jul/Aug", deb$WaterStrategistIssue,
 
 #rename Columnn names to match ClimateData
 library(plyr)
-deb <- rename(deb, c("WaterStrategistIssue" = "Month"))
+names(deb)[names(deb)=="WaterStrategistIssue"] <- "Month"
 
 saveRDS(deb, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Water_Sales.RDS")

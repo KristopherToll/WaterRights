@@ -1,4 +1,5 @@
 # Kristopher C. Toll
+# Use Harry Potter references when conveient
 # Cleaning state data on rainfall
 
 AZ <- read.table(file ="C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/AZ.txt",
@@ -49,43 +50,77 @@ WY <- read.table(file ="C:/Users/Kristopher/odrive/Google Drive/Water Transfer P
                 header = TRUE)
 WY$StateCode <- "WY"
 
-ClimateData <- rbind(AZ, CA, CO, ID, MT, NM, NV, OR, TX, UT, WA, WY)
+Potter <- rbind(AZ, CA, CO, ID, MT, NM, NV, OR, TX, UT, WA, WY)
 
 # Split Dates
 library(tidyr)
 
-df <- data.frame(date = ClimateData$YearMonth)
+df <- data.frame(date = Potter$YearMonth)
 
 dates <- df %>% separate(date, into = c('year', 'month'), sep = 4)
 
-ClimateData$Year <- dates$year
-ClimateData$Month <- dates$month
+Potter$Year <- dates$year
+Potter$Month <- dates$month
 
 # rewrite month numbers as abr. months
 # Use Jul/Aug to match the Water_Sales data
-ClimateData$Month <- gsub("^01$", "Jan", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^02$", "Feb", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^03$", "Mar", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^04$", "Apr", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^05$", "May", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^06$", "Jun", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^07$", "Jul/Aug", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^08$", "Jul/Aug", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^09$", "Sep", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^10$", "Oct", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^11$", "Nov", ClimateData$Month, perl = TRUE)
-ClimateData$Month <- gsub("^12$", "Dec", ClimateData$Month, perl = TRUE)
+Potter$Month <- gsub("^01$", "Jan", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^02$", "Feb", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^03$", "Mar", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^04$", "Apr", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^05$", "May", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^06$", "Jun", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^07$", "Jul/Aug", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^08$", "Jul/Aug", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^09$", "Sep", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^10$", "Oct", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^11$", "Nov", Potter$Month, perl = TRUE)
+Potter$Month <- gsub("^12$", "Dec", Potter$Month, perl = TRUE)
 
 
 # Rename StateCode to State
 library(plyr)
-ClimateData <- rename(ClimateData, c("StateCode" = "State"))
+Potter <- rename(Potter, c("StateCode" = "State"))
 
 # Drop YearMonth 
-ClimateData$YearMonth <- NULL
-
+Potter$YearMonth <- NULL
+Potter$Division <- NULL
 
 # Use average of July and Auguest for Jul/Aug
+# Subset things out to take averages and then bind back in
+library(mosaic)
 
+Malfoy <- subset(Potter, Month != "Jul/Aug")
+
+library(data.table)
+Granger <- subset(Potter, Month == "Jul/Aug")
+Granger$indx <- seq(1, nrow(Granger))
+
+PCP = aggregate(PCP ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+TAVG = aggregate(TAVG ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+PDSI = aggregate(PDSI ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+PHDI = aggregate(PHDI ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+ZNDX = aggregate(ZNDX ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+PMDI = aggregate(PMDI ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+CDD = aggregate(CDD ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+HDD = aggregate(HDD ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+SP01 = aggregate(SP01 ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+SP02 = aggregate(SP02 ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+SP03 = aggregate(SP03 ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+SP06 = aggregate(SP06 ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+SP09 = aggregate(SP09 ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+SP12 = aggregate(SP12 ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+SP24 = aggregate(SP24 ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+TMIN = aggregate(TMIN ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+TMAX = aggregate(TMAX ~ State + Month + Year, transform(Granger, indx = cumsum(substr(indx, 551, 552) == '00')), mean)
+
+doby <- cbind(PCP, TAVG$TAVG, PDSI$PDSI, PHDI$PHDI, ZNDX$ZNDX, PMDI$PMDI, CDD$CDD, HDD$HDD, SP01$SP01, SP02$SP02, SP03$SP03, SP06$SP06, SP09$SP09, SP12$SP12, SP24$SP24, TMIN$TMIN, TMAX$TMAX)
+
+doby <- rename(doby, c("TAVG$TAVG" = "TAVG", "PDSI$PDSI" = "PDSI", "PHDI$PHDI" = "PHDI", "ZNDX$ZNDX" = "ZNDX", "PMDI$PMDI" = "PMDI", "CDD$CDD" = "CDD", "HDD$HDD" = "HDD", "SP01$SP01" = "SP01", "SP02$SP02" = "SP02",
+                       "SP03$SP03" = "SP03", "SP06$SP06" = "SP06", "SP09$SP09" = "SP09", "SP12$SP12" = "SP12", "SP24$SP24" = "SP24", "TMIN$TMIN" = "TMIN", "TMAX$TMAX" = "TMAX"))
+
+# rbind malfoy and doby
+
+ClimateData <- rbind(doby, Malfoy)
 
 saveRDS(ClimateData, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/climate_data.RDS")
