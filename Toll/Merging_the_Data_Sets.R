@@ -29,4 +29,8 @@ table(ClimateData$Month)
 table(Water_Sales$Month)
 table(MasterData$Month)
 
+<<<<<<< HEAD
 # Everthing Checks out
+=======
+#Everthing Checks out
+>>>>>>> 57101cc97636e7c8e5dcdf318944e47243367e02
