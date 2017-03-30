@@ -29,8 +29,10 @@ table(ClimateData$Month)
 table(Water_Sales$Month)
 table(MasterData$Month)
 
-<<<<<<< HEAD
-# Everthing Checks out
-=======
-#Everthing Checks out
->>>>>>> 57101cc97636e7c8e5dcdf318944e47243367e02
+
+# save as an csv and dta
+
+library(foreign)
+
+write.csv(MasterData, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData.csv")
+write.dta(MasterData, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData.dta")

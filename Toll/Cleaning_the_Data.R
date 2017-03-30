@@ -22,7 +22,8 @@ dory <- subset(nemo, TotalPrice != "NA"
 # Removing Lease Observations and Combinations
 # To remove Sales use a one instead
 bruce <- subset(dory, Lease == "0"
-                & Combination =="0")
+                & Combination =="0"
+                & Exchange == "0")
 
 # Only sales and exhanges are in bruce
 table(bruce$Sale)
@@ -32,6 +33,7 @@ marlin <- bruce
 marlin$Unknown <- NULL
 marlin$Recycled <- NULL
 marlin$LeaseDuration <- NULL
+marlin$Exchange <- NULL
 
 # Now to fix time!
 # Some observations are recored in two months such as July/Aug 

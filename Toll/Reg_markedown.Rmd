@@ -1,0 +1,69 @@
+---
+title: "Reggression"
+author: "Kristopher C. Toll"
+date: "March 28, 2017"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(mosaic)
+library(car)
+library(MASS)
+library(gvlma)
+library(sandwich)
+library(lmtest)
+options(scipen=999999)
+```
+
+## R Markdown
+
+
+```{r}
+RMasterData  <- read.csv(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_regression.csv", header = TRUE)
+```
+
+## des stats varaibles
+
+```{r des stats}
+sum(RMasterData$AgtoAg)
+sum(RMasterData$AgtoEnivo)
+sum(RMasterData$AgtoUrban)
+sum(RMasterData$UrbantoAg)
+sum(RMasterData$UrbantoEnviro)
+sum(RMasterData$UrbantoUrban)
+sum(RMasterData$EnvirotoAg)
+sum(RMasterData$EnvirotoUrban)
+sum(RMasterData$EnvirotoEnviro)
+
+mean(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$Month)
+mean(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$State)
+
+sd(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$Month)
+sd(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$State)
+```
+
+
+## Regression
+
+$$
+  Y_i = \beta_0 + \beta_1 CommitedAveageAcreFeet_{i} + \beta_2 AgtoUrban_{i} + \beta_3 AgtoEnivo_{i} + \beta_4 UrbantoAg_{i} + \beta_5 UrbantoEnviro_{i} + \beta_6 UrbantoUrban_{i} + \beta_7 PDSI_{i} + \delta_(8-17) Months_{i} + \delta_(18-28) Stat_{i} + \epsilon_i
+$$
+
+```{r regression1}
+reg1 <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ CommitedAverageAcreFeet + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoEnviro + UrbantoUrban + PDSI + Jan + Feb + Mar + Apr + May + Jun + Jul.Aug + Oct + Nov + Dec + AZ + CA + ID + MT + NM + NV + OR + TX + UT + WA + WY, data = RMasterData)
+summary(reg1)
+
+
+bptest(reg1)
+vif(reg1)
+resettest(reg1)
+dwtest(reg1)
+```
+
+```{r reg2}
+reg2 <- coeftest(reg1, vcov. = vcovHC(reg1, "HC1"))
+reg2
+```
