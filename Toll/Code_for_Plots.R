@@ -21,6 +21,9 @@ ggplot(data = MasterData, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot
 
 ggplot(data = MasterData, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot)) + geom_jitter()  + aes(colour=Month) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Prices per Acre-Foot by State") 
 
+ggplot( data = RMasterData, aes(x = InflationAdjustedPricePerAnnualAcreFoot)) + geom_histogram(binwidth=500) + aes(colour=State) + facet_wrap(~State, ncol=4, scales = "free_y") + labs(title="Histogram of Price by State") + theme(legend.position="none") 
+
+
 # Store and Remove Outliers
 Outliers1 <- subset(MasterData, ObsNumber == "719")
 Outliers2 <- subset(MasterData, ObsNumber == "722")

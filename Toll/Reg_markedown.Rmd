@@ -3,8 +3,8 @@ title: "Reggression"
 author: "Kristopher C. Toll"
 date: "March 28, 2017"
 output:
-  word_document: default
   html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -49,7 +49,9 @@ sd(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$State)
 ## Regression
 
 $$
-  Y_i = \beta_0 + \beta_1 CommitedAveageAcreFeet_{i} + \beta_2 AgtoUrban_{i} + \beta_3 AgtoEnivo_{i} + \beta_4 UrbantoAg_{i} + \beta_5 UrbantoEnviro_{i} + \beta_6 UrbantoUrban_{i} + \beta_7 PDSI_{i} + \delta_(8-17) Months_{i} + \delta_(18-28) Stat_{i} + \epsilon_i
+  Y_i = \beta_0 + \beta_1 CommitedAveageAcreFeet_{i} + \delta_2 AgtoUrban_{i} + \delta_3 AgtoEnivo_{i} + \delta_4 UrbantoAg_{i} +
+  \delta_5 UrbantoEnviro_{i} + \delta_6 UrbantoUrban_{i}
+  + \beta_7 PDSI_{i} + \delta_(8-17) Months_{i} + \delta_(18-28) Stat_{i} + \epsilon_i
 $$
 
 ```{r regression1}

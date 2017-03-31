@@ -172,7 +172,9 @@ $(document).ready(function () {
 <div id="regression" class="section level2">
 <h2>Regression</h2>
 <p><span class="math display">\[
-  Y_i = \beta_0 + \beta_1 CommitedAveageAcreFeet_{i} + \beta_2 AgtoUrban_{i} + \beta_3 AgtoEnivo_{i} + \beta_4 UrbantoAg_{i} + \beta_5 UrbantoEnviro_{i} + \beta_6 UrbantoUrban_{i} + \beta_7 PDSI_{i} + \delta_(8-17) Months_{i} + \delta_(18-28) Stat_{i} + \epsilon_i
+  Y_i = \beta_0 + \beta_1 CommitedAveageAcreFeet_{i} + \delta_2 AgtoUrban_{i} + \delta_3 AgtoEnivo_{i} + \delta_4 UrbantoAg_{i} +
+  \delta_5 UrbantoEnviro_{i} + \delta_6 UrbantoUrban_{i}
+  + \beta_7 PDSI_{i} + \delta_(8-17) Months_{i} + \delta_(18-28) Stat_{i} + \epsilon_i
 \]</span></p>
 <pre class="r"><code>reg1 &lt;- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ CommitedAverageAcreFeet + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoEnviro + UrbantoUrban + PDSI + Jan + Feb + Mar + Apr + May + Jun + Jul.Aug + Oct + Nov + Dec + AZ + CA + ID + MT + NM + NV + OR + TX + UT + WA + WY, data = RMasterData)
 summary(reg1)</code></pre>
