@@ -21,7 +21,7 @@ ggplot(data = MasterData, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot
 
 ggplot(data = MasterData, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot)) + geom_jitter()  + aes(colour=Month) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Prices per Acre-Foot by State") 
 
-ggplot( data = RMasterData, aes(x = InflationAdjustedPricePerAnnualAcreFoot)) + geom_histogram(binwidth=500) + aes(colour=State) + facet_wrap(~State, ncol=4, scales = "free_y") + labs(title="Histogram of Price by State") + theme(legend.position="none") 
+ggplot( data = RMasterData, aes(x = InflationAdjustedPricePerAnnualAcreFoot)) + geom_histogram(binwidth=500) + aes(colour=State) + theme_bw() + facet_wrap(~State, ncol=4, scales = "free_y") + labs(title="Histogram of Price by State") + theme(legend.position="none") 
 
 
 # Store and Remove Outliers
@@ -47,6 +47,6 @@ ClimateData$Month <- factor(ClimateData$Month, levels = c("Jan", "Feb", "Mar", "
 ggplot(data = ClimateData, aes(x=Month, y=PDSI)) + geom_jitter()  + aes(colour=Month)+ facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="PDSI by State") 
 
 # PHID by state
-ggplot(data = ClimateData, aes(x=Month, y=PHDI)) + geom_boxplot()  + aes(colour=Month) + facet_wrap(~State, ncol=4) + theme(legend.position="none") + labs(title="") 
+ggplot(data = ClimateData, aes(x=Year, y=PDSI)) + geom_jitter()  + aes(colour=State) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="PDSI by Year") 
 
 ggplot(data = ClimateData, aes(x=Month, y=PHDI)) + geom_boxplot()  + aes(colour=Month) + facet_wrap(~State, ncol=4) + theme(legend.position="none") + labs(title="") 
