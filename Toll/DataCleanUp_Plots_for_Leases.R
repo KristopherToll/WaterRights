@@ -4,8 +4,7 @@
 
 # Importing the DATA
 library(readxl)
-nemo <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/Water_Transfer_Data_Feb_10.xls", 
-                   na = "null")
+nemo <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/Water_Transfer_Data_Feb_10.xls")
 
 # Removing "na" from nemo
 dory <- subset(nemo, TotalPrice != "NA" 
@@ -21,22 +20,27 @@ dory <- subset(nemo, TotalPrice != "NA"
 
 # Removing Lease Observations and Combinations
 # To remove Sales use a one instead
-bruce <- subset(dory, Lease == "1"
-                & Combination =="0"
-                & Exchange == "0")
-
-# Only sales and exhanges are in bruce
+bruce <- subset(dory, Lease != "0")
+bruce <- subset(bruce, Sale != "1")
+bruce <- subset(bruce, Exchange != "1")
+bruce <- subset(bruce, Unknown != "1" )
+bruce <- subset(bruce, Combination != "1")
+# Only Leases
 table(bruce$Sale)
-
+table(bruce$Lease)
 # Remove the uneeded columns others
 marlin <- bruce
 marlin$Unknown <- NULL
 marlin$Recycled <- NULL
 marlin$Exchange <- NULL
 
+# Get rid of observations that do not make sense
+marlin <- subset(marlin, WaterStrategistIssue != "39753")
+
 # Now to fix time!
 # Some observations are recored in two months such as July/Aug 
 # abreviations are not always used for example january may be used insead of jan
+
 gill <- marlin
 table(gill$WaterStrategistIssue)
 
@@ -65,6 +69,7 @@ bloat <- subset(gill, gill$WaterStrategistIssue != "Summer/fall"
                 & gill$WaterStrategistIssue != "summer/fall"
                 & gill$WaterStrategistIssue != ""
                 & gill$WaterStrategistIssue != "Jan,Feb,Mar,Sep")
+
 # Make names for months match
 # For months that were entered in as jul-aug or jul/aug. 
 # For this study, the fist month was used to record when the sale took place
@@ -104,40 +109,73 @@ ClimateData <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Tra
 library(dplyr)
 MasterData_Leases <- merge(Leases, ClimateData, c("Month", "Year", "State"))
 
-saveRDS(MasterData_Leases, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases_Leases.RDS")
+
+#Create Dummy Variables for State and Month
+MasterData_Leases$AZ <- ifelse(MasterData_Leases$State=="AZ", 1, 0)
+MasterData_Leases$CA <- ifelse(MasterData_Leases$State=="CA", 1, 0)
+MasterData_Leases$CO <- ifelse(MasterData_Leases$State=="CO", 1, 0)
+MasterData_Leases$ID <- ifelse(MasterData_Leases$State=="ID", 1, 0)
+MasterData_Leases$MT <- ifelse(MasterData_Leases$State=="MT", 1, 0)
+MasterData_Leases$NM <- ifelse(MasterData_Leases$State=="NM", 1, 0)
+MasterData_Leases$NV <- ifelse(MasterData_Leases$State=="NV", 1, 0)
+MasterData_Leases$OR <- ifelse(MasterData_Leases$State=="OR", 1, 0)
+MasterData_Leases$TX <- ifelse(MasterData_Leases$State=="TX", 1, 0)
+MasterData_Leases$UT <- ifelse(MasterData_Leases$State=="UT", 1, 0)
+MasterData_Leases$WA <- ifelse(MasterData_Leases$State=="WA", 1, 0)
+MasterData_Leases$WY <- ifelse(MasterData_Leases$State=="WY", 1, 0)
+
+MasterData_Leases$Apr <- ifelse(MasterData_Leases$Month=="Apr", 1, 0)
+MasterData_Leases$Dec <- ifelse(MasterData_Leases$Month=="Dec", 1, 0)
+MasterData_Leases$Feb <- ifelse(MasterData_Leases$Month=="Feb", 1, 0)
+MasterData_Leases$Jan <- ifelse(MasterData_Leases$Month=="Jan", 1, 0)
+MasterData_Leases$Jul.Aug <- ifelse(MasterData_Leases$Month=="Jul/Aug", 1, 0)
+MasterData_Leases$Jun <- ifelse(MasterData_Leases$Month=="Jun", 1, 0)
+MasterData_Leases$Mar <- ifelse(MasterData_Leases$Month=="Mar", 1, 0)
+MasterData_Leases$May <- ifelse(MasterData_Leases$Month=="May", 1, 0)
+MasterData_Leases$Nov <- ifelse(MasterData_Leases$Month=="Nov", 1, 0)
+MasterData_Leases$Oct <- ifelse(MasterData_Leases$Month=="Oct", 1, 0)
+MasterData_Leases$Sep <- ifelse(MasterData_Leases$Month=="Sep", 1, 0)
+
+MasterData_Leases <- subset(MasterData_Leases, ObsNumber != 3828 & ObsNumber != 3830 & ObsNumber != 3832)
+
+MasterData_Leases$Type <- ifelse(MasterData_Leases$AgtoAg == "1", "AgtoAg", ifelse(MasterData_Leases$AgtoEnivo == "1", "AgtoEnivo", ifelse(MasterData_Leases$AgtoUrban == "1", "AgtoUrban", ifelse(MasterData_Leases$UrbantoAg == "1", "UrbantoAg", ifelse(MasterData_Leases$UrbantoEnviro == "1", "UrbantoEnviro", ifelse(MasterData_Leases$UrbantoUrban == "1", "UrbantoUrban", ifelse(MasterData_Leases$EnvirotoAg == "1", "EnvirotoAg", ifelse(MasterData_Leases$EnvirotoEnviro == "1", "EnvirotoEnviro", "EnvirotoUrban"))))))))
+
+# Saving MasterData Leases
+saveRDS(MasterData_Leases, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases.RDS")
+
 
 library(foreign)
-write.dta(MasterData_Leases, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases_Leases.dta")
-# Useful Plots for Leases and climate data
+write.dta(MasterData_Leases, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases.dta")
+write.csv(MasterData_Leases, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases.csv")
 
-library(ggplot2)
-# Get ride of sicentific notation
-options(scipen=999999)
 
+library(sandwich)
+library(lmtest)
+
+
+options(scipen=999) # This is get rid of scientific notation
+
+# Run regression 
+library(lmtest)
+library(sandwich)
+
+# Regression with 1 add to the dependent
+leasereg1 <- lm(log(InflationAdjustedPricePerAnnualAcreFoot + 1) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoEnviro + UrbantoUrban + EnvirotoEnviro + CommitedAverageAcreFeet + LeaseDuration + PDSI + Jan + Feb + Mar + Apr + May + Jun + Jul.Aug + Oct + Nov + Dec + AZ + CA + ID + MT + NM + NV + OR + TX + UT + WA + WY, data = MasterData_Leases)
+leasereg2 <- coeftest(leasereg1, vcov. = vcovHC(leasereg1, "HC1"))
+
+
+# Regression without the zero price listed in the dataset
+leasereg1.1 <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoEnviro + UrbantoUrban + EnvirotoEnviro + CommitedAverageAcreFeet + LeaseDuration + PDSI + Jan + Feb + Mar + Apr + May + Jun + Jul.Aug + Oct + Nov + Dec + AZ + CA + ID + MT + NM + NV + OR + TX + UT + WA + WY, data = subset(MasterData_Leases, InflationAdjustedPricePerAnnualAcreFoot!= 0))
+leasereg2.1 <- coeftest(leasereg1.1, vcov. = vcovHC(leasereg1.1, "HC1"))
+
+# Leases price by state
 
 MasterData_Leases$Month <- factor(MasterData_Leases$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul/Aug", "Sep", "Oct", "Nov", "Dec"))
 
-# Inflation Adjusted Price per acre Foot
+MasterData_Leases$AgtoUrban <- as.numeric(MasterData_Leases$AgtoUrban)
+MasterData_Leases$UrbantoUrban <- as.character(MasterData_Leases$UrbantoUrban)
 
-ggplot(data = MasterData_Leases, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot)) + geom_jitter()  + aes(colour=Month) + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Lease Price per Acre-Foot") 
+MasterData_Leases$Type <- ifelse(MasterData_Leases$AgtoAg == "1", "AgtoAg", ifelse(MasterData_Leases$AgtoUrban == "1", "AgtoUrban", ifelse(MasterData_Leases$AgtoEnivo =="1", "AgtoEnvio", ifelse(MasterData_Leases$UrbantoAg=="1", "UrbantoAg", ifelse(MasterData_Leases$UrbantoUrban=="1", "UrbantoUrban", ifelse(MasterData_Leases$UrbantoEnviro=="1", "UrbantoEnviro", ifelse(MasterData_Leases$EnvirotoAg=="1","EnvirotoAg", ifelse(MasterData_Leases$EnvirotoUrban=="1", "EnvirotoUrban", "EnvirotoEnviro"))))))))
 
-ggplot(data = MasterData_Leases, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot)) + geom_jitter()  + aes(colour=Month) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Lease Prices per Acre-Foot by State") 
-
-ggplot(data = MasterData_Leases, aes(x = InflationAdjustedPricePerAnnualAcreFoot)) + geom_histogram(binwidth=500) + aes(colour=State) + theme_bw() + facet_wrap(~State, ncol=4, scales = "free_y") + labs(title="Histogram of Lease Price by State") + theme(legend.position="none") 
-
-
-
-
-
-# Climate Data
-ClimateData <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Climate_data.RDS")
-ClimateData$Month <- factor(ClimateData$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul/Aug", "Sep", "Oct", "Nov", "Dec"))
-
-
-# PDSI by State
-ggplot(data = ClimateData, aes(x=Month, y=PDSI)) + geom_jitter()  + aes(colour=Month)+ facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="PDSI by State") 
-
-ggplot(data = ClimateData, aes(x=Year, y=PDSI)) + geom_jitter()  + aes(colour=State) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="PDSI by Year") 
-
-ggplot(data = ClimateData, aes(x=Month, y=PHDI)) + geom_boxplot()  + aes(colour=Month) + facet_wrap(~State, ncol=4) + theme(legend.position="none") + labs(title="") 
+ggplot(data = MasterData_Leases, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot)) + geom_jitter()  + aes(colour=Type) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="right", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Lease Prices per Acre-Foot by State") 
 

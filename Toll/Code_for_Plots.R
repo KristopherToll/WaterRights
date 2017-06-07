@@ -49,3 +49,14 @@ ggplot(data = ClimateData, aes(x=Month, y=PDSI)) + geom_jitter()  + aes(colour=M
 ggplot(data = ClimateData, aes(x=Year, y=PDSI)) + geom_jitter()  + aes(colour=State) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="none", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="PDSI by Year") 
 
 ggplot(data = ClimateData, aes(x=Month, y=PHDI)) + geom_boxplot()  + aes(colour=Month) + facet_wrap(~State, ncol=4) + theme(legend.position="none") + labs(title="") 
+
+# Leases price by state
+
+MasterData_Leases$Month <- factor(MasterData_Leases$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul/Aug", "Sep", "Oct", "Nov", "Dec"))
+
+MasterData_Leases$AgtoUrban <- as.numeric(MasterData_Leases$AgtoUrban)
+MasterData_Leases$UrbantoUrban <- as.character(MasterData_Leases$UrbantoUrban)
+
+MasterData_Leases$Type <- ifelse(MasterData_Leases$AgtoAg == "1", "AgtoAg", ifelse(MasterData_Leases$AgtoUrban == "1", "AgtoUrban", ifelse(MasterData_Leases$AgtoEnivo =="1", "AgtoEnvio", ifelse(MasterData_Leases$UrbantoAg=="1", "UrbantoAg", ifelse(MasterData_Leases$UrbantoUrban=="1", "UrbantoUrban", ifelse(MasterData_Leases$UrbantoEnviro=="1", "UrbantoEnviro", ifelse(MasterData_Leases$EnvirotoAg=="1","EnvirotoAg", ifelse(MasterData_Leases$EnvirotoUrban=="1", "EnvirotoUrban", "EnvirotoEnviro"))))))))
+
+ggplot(data = MasterData_Leases, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot)) + geom_jitter()  + aes(colour=Type) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="right", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Lease Prices per Acre-Foot by State") 

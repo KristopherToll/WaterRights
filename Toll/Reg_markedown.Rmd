@@ -22,27 +22,31 @@ options(scipen=999999)
 
 
 ```{r}
-RMasterData  <- read.csv(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_regression.csv", header = TRUE)
+
+MasterData_Sales <- read.csv(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Sales.csv")
+# Removing the outliers
+MasterData_Sales <- subset(MasterData_Sales, ObsNumber != "719" & ObsNumber != "722" & ObsNumber != "706")
+
 ```
 
-## des stats varaibles
+# Sales
 
-```{r des stats}
-sum(RMasterData$AgtoAg)
-sum(RMasterData$AgtoEnivo)
-sum(RMasterData$AgtoUrban)
-sum(RMasterData$UrbantoAg)
-sum(RMasterData$UrbantoEnviro)
-sum(RMasterData$UrbantoUrban)
-sum(RMasterData$EnvirotoAg)
-sum(RMasterData$EnvirotoUrban)
-sum(RMasterData$EnvirotoEnviro)
+```{r des stats Sales}
+sum(MasterData_Sales$AgtoAg)
+sum(MasterData_Sales$AgtoEnivo)
+sum(MasterData_Sales$AgtoUrban)
+sum(MasterData_Sales$UrbantoAg)
+sum(MasterData_Sales$UrbantoEnviro)
+sum(MasterData_Sales$UrbantoUrban)
+sum(MasterData_Sales$EnvirotoAg)
+sum(MasterData_Sales$EnvirotoUrban)
+sum(MasterData_Sales$EnvirotoEnviro)
 
-mean(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$Month)
-mean(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$State)
+mean(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$Type)
+mean(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$State)
 
-sd(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$Month)
-sd(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$State)
+sd(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$Type)
+sd(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$State)
 ```
 
 
@@ -51,11 +55,11 @@ sd(RMasterData$InflationAdjustedPricePerAnnualAcreFoot ~ RMasterData$State)
 $$
   Y_i = \beta_0 + \beta_1 CommitedAveageAcreFeet_{i} + \delta_2 AgtoUrban_{i} + \delta_3 AgtoEnivo_{i} + \delta_4 UrbantoAg_{i} +
   \delta_5 UrbantoEnviro_{i} + \delta_6 UrbantoUrban_{i}
-  + \beta_7 PDSI_{i} + \delta_(8-17) Months_{i} + \delta_(18-28) Stat_{i} + \epsilon_i
+  + \beta_7 PDSI_{i} + \beta_8 LeaseDuration_{i} + \delta_(8-17) Months_{i} + \delta_(18-28) Stat_{i} + \epsilon_i
 $$
 
-```{r regression1}
-reg1 <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ CommitedAverageAcreFeet + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoEnviro + UrbantoUrban + PDSI + Jan + Feb + Mar + Apr + May + Jun + Jul.Aug + Oct + Nov + Dec + AZ + CA + ID + MT + NM + NV + OR + TX + UT + WA + WY, data = RMasterData)
+```{r regression for sales}
+reg1 <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ CommitedAverageAcreFeet + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoEnviro + UrbantoUrban + PDSI + Jan + Feb + Mar + Apr + May + Jun + Jul.Aug + Oct + Nov + Dec + AZ + CA + ID + MT + NM + NV + OR + TX + UT + WA + WY, data = MasterData_Sales)
 summary(reg1)
 
 
@@ -65,7 +69,45 @@ resettest(reg1)
 dwtest(reg1)
 ```
 
-```{r reg2}
+```{r robust regression for sales}
 reg2 <- coeftest(reg1, vcov. = vcovHC(reg1, "HC1"))
 reg2
+```
+
+
+# Leases
+
+```{r regression for leases}
+
+MasterData_Leases <- read.csv(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases.csv")
+
+# Regression without the zero price listed in the dataset
+leasereg1.1 <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoEnviro + UrbantoUrban + EnvirotoEnviro + CommitedAverageAcreFeet + LeaseDuration + PDSI + Jan + Feb + Mar + Apr + May + Jun + Jul.Aug + Oct + Nov + Dec + AZ + CA + ID + MT + NM + NV + OR + TX + UT + WA + WY, data = subset(MasterData_Leases, InflationAdjustedPricePerAnnualAcreFoot!= 0))
+
+bptest(leasereg1.1)
+vif(leasereg1.1)
+resettest(leasereg1.1)
+dwtest(leasereg1.1)
+
+leasereg2.1 <- coeftest(leasereg1.1, vcov. = vcovHC(leasereg1.1, "HC1"))
+print(summary(leasereg1.1))
+leasereg2.1
+```
+
+```{r des stats Leases}
+sum(MasterData_Leases$AgtoAg)
+sum(MasterData_Leases$AgtoEnivo)
+sum(MasterData_Leases$AgtoUrban)
+sum(MasterData_Leases$UrbantoAg)
+sum(MasterData_Leases$UrbantoEnviro)
+sum(MasterData_Leases$UrbantoUrban)
+sum(MasterData_Leases$EnvirotoAg)
+sum(MasterData_Leases$EnvirotoUrban)
+sum(MasterData_Leases$EnvirotoEnviro)
+
+mean(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$Type)
+mean(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$State)
+
+sd(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$Type)
+sd(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$State)
 ```

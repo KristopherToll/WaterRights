@@ -93,4 +93,82 @@ deb$WaterStrategistIssue <- gsub("(^Aug$)", "Jul/Aug", deb$WaterStrategistIssue,
 library(plyr)
 names(deb)[names(deb)=="WaterStrategistIssue"] <- "Month"
 
+library(data.table)
+# Read in the Data
+ClimateData <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Climate_data.RDS")
+
+Water_Sales <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Water_Sales.RDS")
+
+
+# Merge
+library(dplyr)
+MasterData_Sales <- merge(Water_Sales, ClimateData, c("Month", "Year", "State"))
+
+#Create Dummy Variables for State and Month
+MasterData_Sales$AZ <- ifelse(MasterData_Sales$State=="AZ", 1, 0)
+MasterData_Sales$CA <- ifelse(MasterData_Sales$State=="CA", 1, 0)
+MasterData_Sales$CO <- ifelse(MasterData_Sales$State=="CO", 1, 0)
+MasterData_Sales$ID <- ifelse(MasterData_Sales$State=="ID", 1, 0)
+MasterData_Sales$MT <- ifelse(MasterData_Sales$State=="MT", 1, 0)
+MasterData_Sales$NM <- ifelse(MasterData_Sales$State=="NM", 1, 0)
+MasterData_Sales$NV <- ifelse(MasterData_Sales$State=="NV", 1, 0)
+MasterData_Sales$OR <- ifelse(MasterData_Sales$State=="OR", 1, 0)
+MasterData_Sales$TX <- ifelse(MasterData_Sales$State=="TX", 1, 0)
+MasterData_Sales$UT <- ifelse(MasterData_Sales$State=="UT", 1, 0)
+MasterData_Sales$WA <- ifelse(MasterData_Sales$State=="WA", 1, 0)
+MasterData_Sales$WY <- ifelse(MasterData_Sales$State=="WY", 1, 0)
+
+MasterData_Sales$Apr <- ifelse(MasterData_Sales$Month=="Apr", 1, 0)
+MasterData_Sales$Dec <- ifelse(MasterData_Sales$Month=="Dec", 1, 0)
+MasterData_Sales$Feb <- ifelse(MasterData_Sales$Month=="Feb", 1, 0)
+MasterData_Sales$Jan <- ifelse(MasterData_Sales$Month=="Jan", 1, 0)
+MasterData_Sales$Jul.Aug <- ifelse(MasterData_Sales$Month=="Jul/Aug", 1, 0)
+MasterData_Sales$Jun <- ifelse(MasterData_Sales$Month=="Jun", 1, 0)
+MasterData_Sales$Mar <- ifelse(MasterData_Sales$Month=="Mar", 1, 0)
+MasterData_Sales$May <- ifelse(MasterData_Sales$Month=="May", 1, 0)
+MasterData_Sales$Nov <- ifelse(MasterData_Sales$Month=="Nov", 1, 0)
+MasterData_Sales$Oct <- ifelse(MasterData_Sales$Month=="Oct", 1, 0)
+MasterData_Sales$Sep <- ifelse(MasterData_Sales$Month=="Sep", 1, 0)
+
+# Create a List that shows combination of buyer and seller
+MasterData_Sales$Type <- ifelse(MasterData_Sales$AgtoAg == "1", "AgtoAg", ifelse(MasterData_Sales$AgtoUrban == "1", "AgtoUrban", ifelse(MasterData_Sales$AgtoEnivo =="1", "AgtoEnvio", ifelse(MasterData_Sales$UrbantoAg=="1", "UrbantoAg", ifelse(MasterData_Sales$UrbantoUrban=="1", "UrbantoUrban", ifelse(MasterData_Sales$UrbantoEnviro=="1", "UrbantoEnviro", ifelse(MasterData_Sales$EnvirotoAg=="1","EnvirotoAg", ifelse(MasterData_Sales$EnvirotoUrban=="1", "EnvirotoUrban", "EnvirotoEnviro"))))))))
+
+
+saveRDS(MasterData_Sales, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Sales.RDS")
+
+# Verify that MasterData_Sales has the same number of observations as Water_Sales
+
+table(ClimateData$State)
+table(Water_Sales$State)
+table(MasterData_Sales$State)
+
+table(ClimateData$Year)
+table(Water_Sales$Year)
+table(MasterData_Sales$Year)
+
+table(ClimateData$Month)
+table(Water_Sales$Month)
+table(MasterData_Sales$Month)
+
+
+# save as an csv and dta
+
+library(foreign)
+
+write.csv(MasterData_Sales, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Sales.csv")
+write.dta(MasterData_Sales, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Sales.dta")
+
+
 saveRDS(deb, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Water_Sales.RDS")
+
+# Making Plots
+
+library(ggplot2)
+options(scipen=999999)
+MasterData_Sales <- subset(MasterData_Sales, ObsNumber != "719" & ObsNumber != "722" & ObsNumber != "706")
+
+MasterData_Sales$Type <- ifelse(MasterData_Sales$AgtoAg == "1", "AgtoAg", ifelse(MasterData_Sales$AgtoUrban == "1", "AgtoUrban", ifelse(MasterData_Sales$AgtoEnivo =="1", "AgtoEnvio", ifelse(MasterData_Sales$UrbantoAg=="1", "UrbantoAg", ifelse(MasterData_Sales$UrbantoUrban=="1", "UrbantoUrban", ifelse(MasterData_Sales$UrbantoEnviro=="1", "UrbantoEnviro", ifelse(MasterData_Sales$EnvirotoAg=="1","EnvirotoAg", ifelse(MasterData_Sales$EnvirotoUrban=="1", "EnvirotoUrban", "EnvirotoEnviro"))))))))
+MasterData_Sales$Month <- factor(MasterData_Sales$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul/Aug", "Sep", "Oct", "Nov", "Dec"))
+
+ggplot(data = MasterData_Sales, aes(x=Month, y=InflationAdjustedPricePerAnnualAcreFoot)) + geom_jitter()  + aes(colour=Type) + facet_wrap(~State, ncol=4, scales = "free_y") + theme(legend.position="right", axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Sale Prices per Acre-Foot by State") 
+
