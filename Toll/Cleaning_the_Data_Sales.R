@@ -7,6 +7,19 @@ library(readxl)
 nemo <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/Water_Transfer_Data_Feb_10.xls", 
                    na = "null")
 
+nemo <- subset(nemo, IDCode != "CO1857"
+               & IDCode != "CO1875"
+               & IDCode != "NV155"
+               & IDCode != "OR109"
+               & IDCode != "OR111"
+               & IDCode != "OR113"
+               & IDCode != "WA55"
+               & IDCode !="AZ227"
+               & IDCode != "AZ228"
+               & IDCode != "CA626"
+               & IDCode != "CA625")
+
+
 # Removing "na" from nemo
 dory <- subset(nemo, TotalPrice != "NA" 
                  & nemo$MinimumAnnualAcreFeet != "NA" 
@@ -97,12 +110,9 @@ library(data.table)
 # Read in the Data
 ClimateData <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Climate_data.RDS")
 
-Water_Sales <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Water_Sales.RDS")
-
-
 # Merge
 library(dplyr)
-MasterData_Sales <- merge(Water_Sales, ClimateData, c("Month", "Year", "State"))
+MasterData_Sales <- merge(deb, ClimateData, c("Month", "Year", "State"))
 
 #Create Dummy Variables for State and Month
 MasterData_Sales$AZ <- ifelse(MasterData_Sales$State=="AZ", 1, 0)

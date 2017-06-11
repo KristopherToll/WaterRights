@@ -6,6 +6,20 @@
 library(readxl)
 nemo <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/Water_Transfer_Data_Feb_10.xls")
 
+# Remove Observations that fit under no classification
+
+nemo <- subset(nemo, IDCode != "CO1857"
+               & IDCode != "CO1875"
+               & IDCode != "NV155"
+               & IDCode != "OR109"
+               & IDCode != "OR111"
+               & IDCode != "OR113"
+               & IDCode != "WA55"
+               & IDCode !="AZ227"
+               & IDCode != "AZ228"
+               & IDCode != "CA626"
+               & IDCode != "CA625")
+
 # Removing "na" from nemo
 dory <- subset(nemo, TotalPrice != "NA" 
                & nemo$MinimumAnnualAcreFeet != "NA" 
@@ -16,7 +30,8 @@ dory <- subset(nemo, TotalPrice != "NA"
                & nemo$CommitedMaximumAcreFeet != "NA"
                & nemo$InflationAdjustedTotalPrice != "NA"
                & nemo$InflationAdjustedPricePerAnnualAcreFoot != "NA"
-               & nemo$InflationAdjustedPricePerCommittedAcreFoot != "NA")
+               & nemo$InflationAdjustedPricePerCommittedAcreFoot != "NA"
+               & nemo$LeaseDuration != "NA")
 
 # Removing Lease Observations and Combinations
 # To remove Sales use a one instead
