@@ -8,6 +8,8 @@ nemo <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Proje
 
 # Remove Observations that fit under no classification
 
+nemo <- subset(nemo, ObsNumber != "719" & ObsNumber != "722" & ObsNumber != "706")
+
 nemo <- subset(nemo, IDCode != "CO1857"
                & IDCode != "CO1875"
                & IDCode != "NV155"

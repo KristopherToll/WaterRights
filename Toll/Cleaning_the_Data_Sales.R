@@ -7,6 +7,8 @@ library(readxl)
 nemo <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/Water_Transfer_Data_Feb_10.xls", 
                    na = "null")
 
+nemo <- subset(nemo, ObsNumber != "719" & ObsNumber != "722" & ObsNumber != "706")
+
 nemo <- subset(nemo, IDCode != "CO1857"
                & IDCode != "CO1875"
                & IDCode != "NV155"

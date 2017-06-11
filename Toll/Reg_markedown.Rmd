@@ -24,9 +24,6 @@ options(scipen=999999)
 ```{r}
 
 MasterData_Sales <- read.csv(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Sales.csv")
-# Removing the outliers
-MasterData_Sales <- subset(MasterData_Sales, ObsNumber != "719" & ObsNumber != "722" & ObsNumber != "706")
-
 ```
 
 # Sales
