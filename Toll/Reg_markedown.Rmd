@@ -29,20 +29,16 @@ MasterData_Sales <- read.csv(file = "C:/Users/Kristopher/odrive/Google Drive/Wat
 # Sales
 
 ```{r des stats Sales}
-sum(MasterData_Sales$AgtoAg)
-sum(MasterData_Sales$AgtoEnivo)
-sum(MasterData_Sales$AgtoUrban)
-sum(MasterData_Sales$UrbantoAg)
-sum(MasterData_Sales$UrbantoEnviro)
-sum(MasterData_Sales$UrbantoUrban)
-sum(MasterData_Sales$EnvirotoAg)
-sum(MasterData_Sales$EnvirotoUrban)
-sum(MasterData_Sales$EnvirotoEnviro)
+table(MasterData_Sales$Type)
 
 mean(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$Type)
-mean(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$State)
 
 sd(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$Type)
+
+table(MasterData_Sales$State)
+
+mean(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$State)
+
 sd(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Sales$State)
 ```
 
@@ -92,19 +88,15 @@ leasereg2.1
 ```
 
 ```{r des stats Leases}
-sum(MasterData_Leases$AgtoAg)
-sum(MasterData_Leases$AgtoEnivo)
-sum(MasterData_Leases$AgtoUrban)
-sum(MasterData_Leases$UrbantoAg)
-sum(MasterData_Leases$UrbantoEnviro)
-sum(MasterData_Leases$UrbantoUrban)
-sum(MasterData_Leases$EnvirotoAg)
-sum(MasterData_Leases$EnvirotoUrban)
-sum(MasterData_Leases$EnvirotoEnviro)
+table(MasterData_Leases$Type)
 
 mean(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$Type)
-mean(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$State)
 
 sd(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$Type)
+
+table(MasterData_Leases$State)
+
+mean(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$State)
+
 sd(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot ~ MasterData_Leases$State)
 ```
