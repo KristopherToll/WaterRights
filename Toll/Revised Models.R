@@ -116,14 +116,15 @@ subsamp_ddurt_season_robust <- coeftest(subsamp_ddurt_season, vcov=vcovHC, type 
 subsamp_ddurt_year <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + AverageAnnualAcreFeet + as.factor(LeaseDuration_a) + as.factor(Year), data = subset(MasterData_Leases))
 subsamp_ddurt_year_robust <- coeftest(subsamp_ddurt_year, vcov=vcovHC, type = "HC0")
 
+stargazer(subsamp_durt, subsamp_ddurt, subsamp_ddurt_season, subsamp_ddurt_season_robust,subsamp_ddurt_year, subsamp_ddurt_year_robust, title = "Subsample on leases", dep.var.labels = c("Log Price per Acre Foot", "Log Price per Acre Foot", "Log Price per Acre Foot", "Log Price per Acre Foot"), column.labels = c("Lease Duration as an Integer", "Lease Duration as interecpts", "Season Effects", "Robust Season Effects", "Year Effects", "Robust Year Effects"), type = "html", out = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/LeaseDuration_subsample_models.htm")
+
 expir <- lm(log(InflationAdjustedPriceperAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + AverageAnnualAcreFeet + LeaseDuration, data = subset(rawdata_l))
 expir2 <- lm(log(InflationAdjustedPriceperAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + AverageAnnualAcreFeet + as.factor(LeaseDuration_a), data = subset(rawdata_l))
 expir3 <- lm(log(InflationAdjustedPriceperAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + AverageAnnualAcreFeet + as.factor(LeaseDuration_a) + as.factor(Year), data = subset(rawdata_l))
+expir4 <- lm(log(InflationAdjustedPriceperAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + AverageAnnualAcreFeet + as.factor(LeaseDuration_a) + as.factor(Year)+ relevel(as.factor(State), "CA"), data = subset(rawdata_l, rawdata_l$State != "NV"))
+expir4_robust <- coeftest(expir4, vcov=vcovHC, type = "HC0")
 
-
-stargazer(subsamp_durt, subsamp_ddurt, subsamp_ddurt_season, subsamp_ddurt_season_robust,subsamp_ddurt_year, subsamp_ddurt_year_robust, title = "Subsample on leases", dep.var.labels = c("Log Price per Acre Foot", "Log Price per Acre Foot", "Log Price per Acre Foot", "Log Price per Acre Foot"), column.labels = c("Lease Duration as an Integer", "Lease Duration as interecpts", "Season Effects", "Robust Season Effects", "Year Effects", "Robust Year Effects"), type = "html", out = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/LeaseDuration_subsample_models.htm")
-
-stargazer(expir, expir2, expir3, title = "Full Sample on leases", dep.var.labels = c("Log Price per Acre Foot", "Log Price per Acre Foot", "Log Price per Acre Foot", "Log Price per Acre Foot"), column.labels = c("Lease Duration as an Integer", "Lease Duration as interecpts", "Year Effects"), type = "html", out = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/LeaseDuration_Fullsample_models.htm")
+stargazer(expir, expir2, expir3, expir4, expir4_robust, title = "Full Sample on leases", dep.var.labels = c("Log Price per Acre Foot", "Log Price per Acre Foot", "Log Price per Acre Foot", "Log Price per Acre Foot"), column.labels = c("Lease Duration as an Integer", "Lease Duration as interecpts", "Year Effects"), type = "html", out = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/LeaseDuration_Fullsample_models.htm")
 
 # State and Season intercepts on subsample
 
