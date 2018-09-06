@@ -16,6 +16,10 @@ options(scipen=999)
 library(plm)
 #panel <- pdata.frame(MasterData, index = c("State", "Year"), ) 
 MasterData$Month <- factor(MasterData$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul/Aug", "Sep", "Oct", "Nov", "Dec"))
+MasterData$season <- ifelse(MasterData$Month == "Jan" | MasterData$Month =="Feb" | MasterData$Month == "Mar", "Qrt1", ifelse(MasterData$Month == "Apr" | MasterData$Month == "May"| MasterData$Month == "Jun", "Qrt2",  ifelse(MasterData$Month == "Jul/Aug"| MasterData$Month == "Sep", "Qrt3", "Qtr4")))
+MasterData$Log_Price <- log(MasterData$InflationAdjustedPricePerAnnualAcreFoot)
+
+write.csv(MasterData, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_sales.csv")
 
 pooled <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + AverageAnnualAcreFeet, data = MasterData)
 pooled_robust <- coeftest(pooled, vcov=vcovHC, type = "HC0")
@@ -26,8 +30,6 @@ pooled_full <- lm(log(InflationAdjustedPriceperAnnualAcreFoot) ~ AgtoUrban + Agt
 #pooled_months_robust <- coeftest(pooled_months, vcov=vcov(pooled_months, type = "HC0"))
 
 # Time Effects Models
-
-MasterData$season <- ifelse(MasterData$Month == "Jan" | MasterData$Month =="Feb" | MasterData$Month == "Mar", "Qrt1", ifelse(MasterData$Month == "Apr" | MasterData$Month == "May"| MasterData$Month == "Jun", "Qrt2",  ifelse(MasterData$Month == "Jul/Aug"| MasterData$Month == "Sep", "Qrt3", "Qtr4")))
 
 pooled_seasons <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + AverageAnnualAcreFeet + as.factor(season), data = MasterData)
 pooled_seasons_robust <- coeftest(pooled_seasons, vcov=vcovHC, type = "HC0")
@@ -90,16 +92,19 @@ rawdata_l <- subset(rawdata_l, rawdata_l$Combination != "1" & rawdata_l$Enviroto
 
 
 # Creating Lease Duration as a dummy
+#MasterData_Leases$season <- ifelse(MasterData_Leases$Month == "Jan" | MasterData_Leases$Month =="Feb" | MasterData_Leases$Month == "Mar", "Qrt1", ifelse(MasterData_Leases$Month == "Apr" | MasterData_Leases$Month == "May"| MasterData_Leases$Month == "Jun", "Qrt2",  ifelse(MasterData_Leases$Month == "Jul.Aug"| MasterData_Leases$Month == "Sep", "Qrt3", "Qtr4")))
 
-MasterData_Leases$LeaseDuration_a <- ifelse(MasterData_Leases$LeaseDuration == "1", "1", ifelse(MasterData_Leases$LeaseDuration == "2", "2", ifelse(MasterData_Leases$LeaseDuration == "3", "3", ifelse(MasterData_Leases$LeaseDuration == "4", "4", ifelse(MasterData_Leases$LeaseDuration >= 5 & MasterData_Leases$LeaseDuration <= 10, "5-10 Years", ifelse(MasterData_Leases$LeaseDuration >= 11 & MasterData_Leases$LeaseDuration <= 20, "11-20 years", "21-100 years"))))))
-MasterData_Leases$LeaseDuration_a <- factor(as.factor(MasterData_Leases$LeaseDuration_a), c("1", "2", "3", "4", "5-10 Years", "11-20 years", "21-100 years"))
+#MasterData_Leases$LeaseDuration_a <- ifelse(MasterData_Leases$LeaseDuration == "1", "1", ifelse(MasterData_Leases$LeaseDuration == "2", "2", ifelse(MasterData_Leases$LeaseDuration == "3", "3", ifelse(MasterData_Leases$LeaseDuration == "4", "4", ifelse(MasterData_Leases$LeaseDuration >= 5 & MasterData_Leases$LeaseDuration <= 10, "5-10 Years", ifelse(MasterData_Leases$LeaseDuration >= 11 & MasterData_Leases$LeaseDuration <= 20, "11-20 years", "21-100 years"))))))
+#MasterData_Leases$LeaseDuration_a <- factor(as.factor(MasterData_Leases$LeaseDuration_a), c("1", "2", "3", "4", "5-10 Years", "11-20 years", "21-100 years"))
+#MasterData_Leases$log_price <- log(MasterData_Leases$InflationAdjustedPricePerAnnualAcreFoot)
+#MasterData_Leases <- MasterData_Leases[1:48, 72:74]
+#write.csv(MasterData_Leases, file ="C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases.csv")
 
 rawdata_l$LeaseDuration_a <- ifelse(rawdata_l$LeaseDuration == "1", "1", ifelse(rawdata_l$LeaseDuration == "2", "2", ifelse(rawdata_l$LeaseDuration == "3", "3", ifelse(rawdata_l$LeaseDuration == "4", "4", ifelse(rawdata_l$LeaseDuration >= 5 & rawdata_l$LeaseDuration <= 10, "5-10 Years", ifelse(rawdata_l$LeaseDuration >= 11 & rawdata_l$LeaseDuration <= 20, "11-20 years", "21-100 years"))))))
 rawdata_l$LeaseDuration_a <- factor(as.factor(rawdata_l$LeaseDuration_a), c("1", "2", "3", "4", "5-10 Years", "11-20 years", "21-100 years"))
 
 # Creating Season
 
-MasterData_Leases$season <- ifelse(MasterData_Leases$Month == "Jan" | MasterData_Leases$Month =="Feb" | MasterData_Leases$Month == "Mar", "Qrt1", ifelse(MasterData_Leases$Month == "Apr" | MasterData_Leases$Month == "May"| MasterData_Leases$Month == "Jun", "Qrt2",  ifelse(MasterData_Leases$Month == "Jul.Aug"| MasterData_Leases$Month == "Sep", "Qrt3", "Qtr4")))
 
 
 # Duration Comparison

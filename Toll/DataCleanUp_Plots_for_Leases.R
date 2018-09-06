@@ -7,6 +7,7 @@ library(readxl)
 nemo <- read_excel("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Raw_Data/Water_Transfer_Data_Feb_10.xls")
 
 # Remove Observations that fit under no classification
+nemo$ObsNumber <- 1:nrow(nemo)
 
 nemo <- subset(nemo, ObsNumber != "719" & ObsNumber != "722" & ObsNumber != "706")
 
@@ -23,17 +24,8 @@ nemo <- subset(nemo, IDCode != "CO1857"
                & IDCode != "CA625")
 
 # Removing "na" from nemo
-dory <- subset(nemo, TotalPrice != "NA" 
-               & nemo$MinimumAnnualAcreFeet != "NA" 
-               & nemo$AverageAnnualAcreFeet != "NA"
-               & nemo$MaximumAnnualAcreFeet != "NA"
-               & nemo$CommittedMinimumAcreFeet != "NA"
-               & nemo$CommitedAverageAcreFeet != "NA"
-               & nemo$CommitedMaximumAcreFeet != "NA"
-               & nemo$InflationAdjustedTotalPrice != "NA"
-               & nemo$InflationAdjustedPricePerAnnualAcreFoot != "NA"
-               & nemo$InflationAdjustedPricePerCommittedAcreFoot != "NA"
-               & nemo$LeaseDuration != "NA")
+dory <- subset(nemo, TotalPrice != "NA"
+               & LeaseDuration != "NA")
 
 # Removing Lease Observations and Combinations
 # To remove Sales use a one instead
@@ -119,7 +111,7 @@ names(deb)[names(deb)=="WaterStrategistIssue"] <- "Month"
 
 Leases <- deb
 
-saveRDS(Leases, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Water_Leases.RDS")
+#saveRDS(Leases, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Water_Leases.RDS")
 
 ClimateData <- readRDS(file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/Climate_data.RDS")
 
@@ -128,34 +120,48 @@ MasterData_Leases <- merge(Leases, ClimateData, c("Month", "Year", "State"))
 
 
 #Create Dummy Variables for State and Month
-MasterData_Leases$AZ <- ifelse(MasterData_Leases$State=="AZ", 1, 0)
-MasterData_Leases$CA <- ifelse(MasterData_Leases$State=="CA", 1, 0)
-MasterData_Leases$CO <- ifelse(MasterData_Leases$State=="CO", 1, 0)
-MasterData_Leases$ID <- ifelse(MasterData_Leases$State=="ID", 1, 0)
-MasterData_Leases$MT <- ifelse(MasterData_Leases$State=="MT", 1, 0)
-MasterData_Leases$NM <- ifelse(MasterData_Leases$State=="NM", 1, 0)
-MasterData_Leases$NV <- ifelse(MasterData_Leases$State=="NV", 1, 0)
-MasterData_Leases$OR <- ifelse(MasterData_Leases$State=="OR", 1, 0)
-MasterData_Leases$TX <- ifelse(MasterData_Leases$State=="TX", 1, 0)
-MasterData_Leases$UT <- ifelse(MasterData_Leases$State=="UT", 1, 0)
-MasterData_Leases$WA <- ifelse(MasterData_Leases$State=="WA", 1, 0)
-MasterData_Leases$WY <- ifelse(MasterData_Leases$State=="WY", 1, 0)
+#MasterData_Leases$AZ <- ifelse(MasterData_Leases$State=="AZ", 1, 0)
+#MasterData_Leases$CA <- ifelse(MasterData_Leases$State=="CA", 1, 0)
+#MasterData_Leases$CO <- ifelse(MasterData_Leases$State=="CO", 1, 0)
+#MasterData_Leases$ID <- ifelse(MasterData_Leases$State=="ID", 1, 0)
+#MasterData_Leases$MT <- ifelse(MasterData_Leases$State=="MT", 1, 0)
+#MasterData_Leases$NM <- ifelse(MasterData_Leases$State=="NM", 1, 0)
+#MasterData_Leases$NV <- ifelse(MasterData_Leases$State=="NV", 1, 0)
+#MasterData_Leases$OR <- ifelse(MasterData_Leases$State=="OR", 1, 0)
+#MasterData_Leases$TX <- ifelse(MasterData_Leases$State=="TX", 1, 0)
+#MasterData_Leases$UT <- ifelse(MasterData_Leases$State=="UT", 1, 0)
+#MasterData_Leases$WA <- ifelse(MasterData_Leases$State=="WA", 1, 0)
+#MasterData_Leases$WY <- ifelse(MasterData_Leases$State=="WY", 1, 0)
 
-MasterData_Leases$Apr <- ifelse(MasterData_Leases$Month=="Apr", 1, 0)
-MasterData_Leases$Dec <- ifelse(MasterData_Leases$Month=="Dec", 1, 0)
-MasterData_Leases$Feb <- ifelse(MasterData_Leases$Month=="Feb", 1, 0)
-MasterData_Leases$Jan <- ifelse(MasterData_Leases$Month=="Jan", 1, 0)
-MasterData_Leases$Jul.Aug <- ifelse(MasterData_Leases$Month=="Jul/Aug", 1, 0)
-MasterData_Leases$Jun <- ifelse(MasterData_Leases$Month=="Jun", 1, 0)
-MasterData_Leases$Mar <- ifelse(MasterData_Leases$Month=="Mar", 1, 0)
-MasterData_Leases$May <- ifelse(MasterData_Leases$Month=="May", 1, 0)
-MasterData_Leases$Nov <- ifelse(MasterData_Leases$Month=="Nov", 1, 0)
-MasterData_Leases$Oct <- ifelse(MasterData_Leases$Month=="Oct", 1, 0)
-MasterData_Leases$Sep <- ifelse(MasterData_Leases$Month=="Sep", 1, 0)
+#MasterData_Leases$Apr <- ifelse(MasterData_Leases$Month=="Apr", 1, 0)
+#MasterData_Leases$Dec <- ifelse(MasterData_Leases$Month=="Dec", 1, 0)
+#MasterData_Leases$Feb <- ifelse(MasterData_Leases$Month=="Feb", 1, 0)
+#MasterData_Leases$Jan <- ifelse(MasterData_Leases$Month=="Jan", 1, 0)
+#MasterData_Leases$Jul.Aug <- ifelse(MasterData_Leases$Month=="Jul/Aug", 1, 0)
+#MasterData_Leases$Jun <- ifelse(MasterData_Leases$Month=="Jun", 1, 0)
+#MasterData_Leases$Mar <- ifelse(MasterData_Leases$Month=="Mar", 1, 0)
+#MasterData_Leases$May <- ifelse(MasterData_Leases$Month=="May", 1, 0)
+#MasterData_Leases$Nov <- ifelse(MasterData_Leases$Month=="Nov", 1, 0)
+#MasterData_Leases$Oct <- ifelse(MasterData_Leases$Month=="Oct", 1, 0)
+#MasterData_Leases$Sep <- ifelse(MasterData_Leases$Month=="Sep", 1, 0)
 
 MasterData_Leases <- subset(MasterData_Leases, ObsNumber != 3828 & ObsNumber != 3830 & ObsNumber != 3832)
 
 MasterData_Leases$Type <- ifelse(MasterData_Leases$AgtoAg == "1", "AgtoAg", ifelse(MasterData_Leases$AgtoEnivo == "1", "AgtoEnivo", ifelse(MasterData_Leases$AgtoUrban == "1", "AgtoUrban", ifelse(MasterData_Leases$UrbantoAg == "1", "UrbantoAg", ifelse(MasterData_Leases$UrbantoEnviro == "1", "UrbantoEnviro", ifelse(MasterData_Leases$UrbantoUrban == "1", "UrbantoUrban", ifelse(MasterData_Leases$EnvirotoAg == "1", "EnvirotoAg", ifelse(MasterData_Leases$EnvirotoEnviro == "1", "EnvirotoEnviro", "EnvirotoUrban"))))))))
+
+MasterData_Leases$Month <- factor(MasterData_Leases$Month, levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul/Aug", "Sep", "Oct", "Nov", "Dec"))
+MasterData_Leases <- subset(MasterData_Leases, MasterData_Leases$InflationAdjustedPriceperAnnualAcreFoot != "0")
+MasterData_Leases <- subset(MasterData_Leases, MasterData_Leases$EnvirotoEnviro != "1")
+
+
+# Creating Lease Duration as a dummy
+
+MasterData_Leases$LeaseDuration_a <- ifelse(MasterData_Leases$LeaseDuration == "1", "1", ifelse(MasterData_Leases$LeaseDuration == "2", "2", ifelse(MasterData_Leases$LeaseDuration == "3", "3", ifelse(MasterData_Leases$LeaseDuration == "4", "4", ifelse(MasterData_Leases$LeaseDuration >= 5 & MasterData_Leases$LeaseDuration <= 10, "5-10 Years", ifelse(MasterData_Leases$LeaseDuration >= 11 & MasterData_Leases$LeaseDuration <= 20, "11-20 years", "21-100 years"))))))
+MasterData_Leases$LeaseDuration_a <- factor(as.factor(MasterData_Leases$LeaseDuration_a), c("1", "2", "3", "4", "5-10 Years", "11-20 years", "21-100 years"))
+
+MasterData_Leases$season <- ifelse(MasterData_Leases$Month == "Jan" | MasterData_Leases$Month =="Feb" | MasterData_Leases$Month == "Mar", "Qrt1", ifelse(MasterData_Leases$Month == "Apr" | MasterData_Leases$Month == "May"| MasterData_Leases$Month == "Jun", "Qrt2",  ifelse(MasterData_Leases$Month == "Jul.Aug"| MasterData_Leases$Month == "Sep", "Qrt3", "Qtr4")))
+
+MasterData_Leases$LogPrice <- log(MasterData_Leases$InflationAdjustedPriceperAnnualAcreFoot)
 
 # Saving MasterData Leases
 saveRDS(MasterData_Leases, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases.RDS")

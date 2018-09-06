@@ -1,3 +1,17 @@
+# Testing for Endogeneity
+
+library(AER)
+
+z <- lm(AverageAnnualAcreFeet ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+
+x <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + z$residuals, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+
+# Endogeneity is a Problem
+
+ivreg_sales <- ivreg(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + AverageAnnualAcreFeet |  AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + PCP, data = subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+
+summary(ivreg_sales, diagnostics = TRUE)
+
 ## Third Edition Revised Models ##
 
 # Sales Models 
@@ -7,6 +21,8 @@ library(lmtest)
 library(sandwich)
 library(car)
 library(plm)
+options(scipen=99999)
+
 
 library(readr)
 MasterData_Sales <- read_csv("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Sales.csv")
@@ -21,53 +37,29 @@ options(scipen=99999)
 #write.csv(MasterData_Sales, file = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_sales.csv")
 
 
-S_OLS <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
-S_OLS_robust1 <- coeftest(S_OLS, vcov=vcovHC, type = "HC0")
-S_OLS_robust1.1 <- coeftest(S_OLS, vcov=vcovHC, type = "HC0")
+S_IV <- ivreg(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + PCP, data = subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+Scov1 <- sqrt(diag(vcovHC(S_IV, type = "HC0")))
 
-cov1 <- sqrt(diag(vcovHC(S_OLS, type = "HC0")))
-a <- vif(S_OLS)
-ncvTest(S_OLS)
+S_IV_state <- ivreg(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + relevel(as.factor(State), "CO") + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + relevel(as.factor(State), "CO") + PDSI + PCP, data = subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+Scov2 <- sqrt(diag(vcovHC(S_IV_state, type = "HC0")))
 
-S_OLS_nq <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
-S_OLS_robust <- coeftest(S_OLS_nq, vcov=vcovHC, type = "HC1")
-cov_nq <- sqrt(diag(vcovHC(S_OLS_nq, type = "HC0")))
-b <- vif(S_OLS_nq)
-ncvTest(S_OLS_nq)
+S_IV_Year <- ivreg(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(Year) + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(Year) + PDSI + PCP, data = subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+Scov3 <- sqrt(diag(vcovHC(S_IV_Year, type = "HC0")))
 
-S_OLS_state <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + relevel(as.factor(State), "CO"), subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
-cov2 <- sqrt(diag(vcovHC(S_OLS_state, type = "HC0")))
-c <- vif(S_OLS_state)
-ncvTest(S_OLS_state)
-S_OLS_state_robust <- coeftest(S_OLS_state, vcov=vcovHC, type = "HC0")
+S_IV_State_Year <- ivreg(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(Year) + relevel(as.factor(State), "CO") + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(Year) + relevel(as.factor(State), "CO") + PDSI + PCP, data = subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+Scov4 <- sqrt(diag(vcovHC(S_IV_State_Year, type = "HC0")))
+
+S_IV_NoAgents <-  ivreg(LogPrice ~ as.factor(Year) + relevel(as.factor(State), "CO") + AverageAnnualAcreFeet | as.factor(Year) + relevel(as.factor(State), "CO") + PDSI + PCP, data = subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+Scov5 <- sqrt(diag(vcovHC(S_IV_NoAgents, type = "HC0")))
+
+S_IV_Season <- ivreg(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(season) + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(season) + PDSI + PCP, data = subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+Scov6 <- sqrt(diag(vcovHC(S_IV_Season, type = "HC0")))
+
+S_IV_Season_state <- ivreg(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(season) + relevel(as.factor(State), "CO") + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(season) + relevel(as.factor(State), "CO") + PDSI + PCP, data = subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+Scov7 <- sqrt(diag(vcovHC(S_IV_Season_state, type = "HC0")))
 
 
-S_OLS_Year <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + as.factor(Year), subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
-cov3 <- sqrt(diag(vcovHC(S_OLS_Year, type = "HC0")))
-d <- vif(S_OLS_Year)
-ncvTest(S_OLS_Year)
-
-S_OLS_State_Year <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + as.factor(Year) + relevel(as.factor(State), "CO"), subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
-cov4 <- sqrt(diag(vcovHC(S_OLS_State_Year, type = "HC0")))
-e <- vif(S_OLS_State_Year)
-ncvTest(S_OLS_State_Year)
-
-S_OLS_NoAgents <- lm(log(InflationAdjustedPricePerAnnualAcreFoot) ~ PDSI + as.factor(Year) + relevel(as.factor(State), "CO"), subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
-cov5 <- sqrt(diag(vcovHC(S_OLS_NoAgents, type = "HC0")))
-f <- vif(S_OLS_NoAgents)
-ncvTest(S_OLS_NoAgents)
-
-S_OLS_Season <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + season, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
-cov6 <- sqrt(diag(vcovHC(S_OLS_Season, type = "HC0")))
-g <- vif(S_OLS_Season)
-ncvTest(S_OLS_Season)
-
-S_OLS_Season_state <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + season + relevel(as.factor(State), "CO"), subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
-cov7 <- sqrt(diag(vcovHC(S_OLS_Season_state, type = "HC0")))
-h <- vif(S_OLS_Season_state)
-ncvTest(S_OLS_Season_state)
-
-stargazer(S_OLS_NoAgents, S_OLS_nq, S_OLS_state, S_OLS_Year, S_OLS_State_Year, S_OLS_Season, S_OLS_Season_state, se = list(cov5, cov_nq, cov2, cov3, cov4, cov6, cov7) ,title = "Permanent Transfers", dep.var.labels = c("Log Price per Acre Foot"), column.labels = c("OLS"), type = "html", out = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/PermanentTransfersDraft3_1NoQ.htm")
+stargazer(S_IV, S_IV_state, S_IV_Year, S_IV_State_Year, S_IV_NoAgents, S_IV_Season, S_IV_Season_state, se = list(Scov1, Scov2, Scov3, Scov4, Scov5, Scov6, Scov7) ,title = "Permanent Transfers", dep.var.labels = c("Log Price per Acre Foot"), column.labels = c("IV"), type = "html", out = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/PermanentTransfersDraft3_IV.htm")
 
 
 ## Lease Models
@@ -121,3 +113,4 @@ p <- vif(L_OLS_Season_state)
 ncvTest(L_OLS_Season_state)
 
 stargazer(L_OLS_DurCont, L_OLS_DurDis, L_OLS_agents, L_OLS_state, L_OLS_year, L_OLS_year_state, L_OLS_Season, L_OLS_Season_state, se = list(Lcov1, Lcov2, Lcov3, Lcov4, Lcov5, Lcov6, Lcov7, Lcov8), title = "Lease Transfers", dep.var.labels = c("Log Price per Acre Foot"), column.labels = c("OLS"), type = "html", out = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/LeaseTransfersDraft3NoQ.htm")
+
