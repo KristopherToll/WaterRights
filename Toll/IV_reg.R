@@ -1,10 +1,27 @@
 # Testing for Endogeneity
 
+library(stargazer)
+library(lmtest)
+library(sandwich)
+library(car)
+library(plm)
 library(AER)
+library(readr)
+MasterData_Sales <- read_csv("C:/Users/A01246966/Box/WaterRights-master/MasterData_Sales.csv")
+options(scipen=99999)
 
-z <- lm(AverageAnnualAcreFeet ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+y <- lm(LogPrice ~ AverageAnnualAcreFeet + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + State + season, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+ycov <- sqrt(diag(vcovHC(y, type = "HC0", method = "white1")))
 
-x <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + z$residuals, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+z <- lm(AverageAnnualAcreFeet ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + State + season, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+zcov <- sqrt(diag(vcovHC(z, type = "HC0")))
+
+x <- lm(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + State + season + z$residuals, subset(MasterData_Sales, MasterData_Sales$State != "MT" & MasterData_Sales$State != "WY"))
+xcov <- sqrt(diag(vcovHC(x, type = "HC0")))
+
+anova(y, x)
+
+stargazer(y, z, x, se = list(ycov, zcov, xcov), no.space = TRUE, title = "Endogenous", dep.var.labels = c("Log Price", "Quantity", "Log Price"), align = TRUE, type = "html", out = "C:/Users/A01246966/Box/WaterRights-master/EndogenousModel.htm")
 
 # Endogeneity is a Problem
 
@@ -16,17 +33,11 @@ summary(ivreg_sales, diagnostics = TRUE)
 
 # Sales Models 
 
-library(stargazer)
-library(lmtest)
-library(sandwich)
-library(car)
-library(plm)
+
 options(scipen=99999)
 
 
-library(readr)
-MasterData_Sales <- read_csv("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Sales.csv")
-options(scipen=99999)
+
 
 #MasterData_Sales$X1_1 <- NULL
 #MasterData_Sales$LogPrice <- log(MasterData_Sales$InflationAdjustedPricePerAnnualAcreFoot)
@@ -59,15 +70,38 @@ S_IV_Season_state <- ivreg(LogPrice ~ AgtoUrban + AgtoEnivo + UrbantoAg + Urbant
 Scov7 <- sqrt(diag(vcovHC(S_IV_Season_state, type = "HC0")))
 
 
-stargazer(S_IV, S_IV_state, S_IV_Year, S_IV_State_Year, S_IV_NoAgents, S_IV_Season, S_IV_Season_state, se = list(Scov1, Scov2, Scov3, Scov4, Scov5, Scov6, Scov7) ,title = "Permanent Transfers", dep.var.labels = c("Log Price per Acre Foot"), column.labels = c("IV"), type = "html", out = "C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/PermanentTransfersDraft3_IV.htm")
+stargazer(S_IV, S_IV_state, S_IV_Year, S_IV_State_Year, S_IV_NoAgents, S_IV_Season, S_IV_Season_state, se = list(Scov1, Scov2, Scov3, Scov4, Scov5, Scov6, Scov7), no.space = TRUE, title = "Permanent Transfers", dep.var.labels = c("Log Price per Acre Foot"), column.labels = c("IV"), align = TRUE, type = "html", out = "C:/Users/A01246966/Box/WaterRights-master/IVSalesReg.htm")
+
+# IV Lease Models
 
 
-## Lease Models
-
-
-MasterData_Leases <- read_csv("C:/Users/Kristopher/odrive/Google Drive/Water Transfer Project/Modified_Data_Models/MasterData_Leases.csv")
+MasterData_Leases <- read_csv("C:/Users/A01246966/Box/WaterRights-master/MasterData_Leases.csv")
 
 MasterData_Leases$LeaseDuration_a <- factor(as.factor(MasterData_Leases$LeaseDuration_a), c("1", "2", "3", "4", "5-10 Years", "11-20 years", "21-100 years"))
+
+L_IV <- ivreg(LogPrice ~ LeaseDuration_a + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + PDSI + PCP, data =  subset(MasterData_Leases, MasterData_Leases$State != "NV"))
+Lcov1 <- sqrt(diag(vcovHC(L_IV, type = "HC0")))
+
+L_IV_state <- ivreg(LogPrice ~ LeaseDuration_a + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + relevel(as.factor(State), "CO") + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + relevel(as.factor(State), "CO") + PDSI + PCP, data =  subset(MasterData_Leases, MasterData_Leases$State != "NV"))
+Lcov2 <- sqrt(diag(vcovHC(L_IV_state, type = "HC0")))
+
+L_IV_Year <- ivreg(LogPrice ~ LeaseDuration_a + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(Year) + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(Year) + PDSI + PCP, data =  subset(MasterData_Leases, MasterData_Leases$State != "NV"))
+Lcov3 <- sqrt(diag(vcovHC(L_IV_Year, type = "HC0")))
+
+L_IV_State_Year <- ivreg(LogPrice ~ LeaseDuration_a + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(Year) + relevel(as.factor(State), "CO") + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(Year) + relevel(as.factor(State), "CO") + PDSI + PCP, data =  subset(MasterData_Leases, MasterData_Leases$State != "NV"))
+Lcov4 <- sqrt(diag(vcovHC(L_IV_State_Year, type = "HC0")))
+
+L_IV_NoAgents <-  ivreg(LogPrice ~ LeaseDuration_a + as.factor(Year) + relevel(as.factor(State), "CO") + AverageAnnualAcreFeet | as.factor(Year) + relevel(as.factor(State), "CO") + PDSI + PCP, data = subset(MasterData_Leases, MasterData_Leases$State != "NV"))
+Lcov5 <- sqrt(diag(vcovHC(L_IV_NoAgents, type = "HC0")))
+
+L_IV_Season <- ivreg(LogPrice ~ LeaseDuration_a + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(season) + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(season) + PDSI + PCP, data =  subset(MasterData_Leases, MasterData_Leases$State != "NV"))
+Lcov6 <- sqrt(diag(vcovHC(L_IV_Season, type = "HC0")))
+
+L_IV_Season_state <- ivreg(LogPrice ~ LeaseDuration_a + AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(season) + relevel(as.factor(State), "CO") + AverageAnnualAcreFeet | AgtoUrban + AgtoEnivo + UrbantoAg + UrbantoUrban + UrbantoEnviro + as.factor(season) + relevel(as.factor(State), "CO") + PDSI + PCP, data =  subset(MasterData_Leases, MasterData_Leases$State != "NV"))
+Lcov7 <- sqrt(diag(vcovHC(L_IV_Season_state, type = "HC0")))
+
+stargazer(L_IV, L_IV_state, L_IV_Year, L_IV_State_Year, L_IV_NoAgents, L_IV_Season, L_IV_Season_state, no.space = TRUE, se = list(Lcov1, Lcov2, Lcov3, Lcov4, Lcov5, Lcov6, Lcov7), title = "Permanent Transfers", dep.var.labels = c("Log Price per Acre Foot"), column.labels = c("IV"), align = TRUE, type = "html", out = "C:/Users/A01246966/Box/WaterRights-master/IVLeasesReg.htm")
+
 
 
 # Lease Models
